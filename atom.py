@@ -42,7 +42,6 @@ class Atom:
 		self.lastHashWaldo = 0
 		self.lastOutputableCheckCycle = 0
 		self.lastOutputableCheckWaldo = 0
-		self.outputable = False
 
 	def getSymbole(self):
 		return self.sym
@@ -516,27 +515,32 @@ class Atom:
 			AtomString =  AtomString + strings
 		return AtomString
 
-	def isOutputable(self,location, cycle, waldo):
+	def isOutputable(self,location, cycle, waldo, bigOutput, isFirst):
 		if(self.lastOutputableCheckCycle == cycle and self.lastOutputableCheckWaldo == waldo): #Already in the list
-			return self.outputable
+			return not isFirst
 		self.lastOutputableCheckWaldo = waldo
 		self.lastOutputableCheckCycle = cycle
-		returnValue = self.isInOutputLocation(location) and not self.isGrabbed
-		self.outputable = returnValue
+		returnValue = self.isInOutputLocation(location, bigOutput) and not self.isGrabbed
 		if(self.leftLink != 0):
-			returnValue = returnValue and self.left.isOutputable(location,cycle,waldo)
+			if(not self.left.isOutputable(location,cycle,waldo, bigOutput, False)):
+				returnValue = False
 		if(self.rightLink != 0):
-			returnValue = returnValue and self.right.isOutputable(location,cycle,waldo)
+			if(not self.right.isOutputable(location,cycle,waldo, bigOutput,False)):
+				returnValue = False
 		if(self.upLink != 0):
-			returnValue = returnValue and self.up.isOutputable(location,cycle,waldo)
+			if(not self.up.isOutputable(location,cycle,waldo, bigOutput, False)):
+				returnValue = False
 		if(self.downLink != 0):
-			returnValue = returnValue and self.down.isOutputable(location,cycle,waldo)
-		self.outputable = returnValue
+			if(not self.down.isOutputable(location,cycle,waldo, bigOutput, False)):
+				returnValue = False
 		return returnValue
 
-	def isInOutputLocation(self,location):
+	def isInOutputLocation(self,location, bigOutput):
 		if(location == "Y"):
-			return (self.X > 5 and self.Y > 3)
+			if(not bigOutput):
+				return (self.X > 5 and self.Y > 3)
+			else:
+				return (self.X > 5)
 		elif(location == "W"):
 			return (self.X > 5 and self.Y < 4)
 

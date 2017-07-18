@@ -24,6 +24,7 @@ class Reactor:
 		self.splitter = []
 		self.fuser = []
 		self.tunnel=[]
+		self.activateBigOutput = False
 
 	def setBonders(self, bonders):
 		self.bonders = bonders
@@ -37,9 +38,11 @@ class Reactor:
 	def setTunnel(self, tunnels):
 		self.tunnel = tunnels
 
-
 	def setSensor(self, sensor):
 		self.sensor = sensor
+
+	def activateDoubleOutput(self):
+		self.activateBigOutput = True
 
 	def setVerbose(self,verbose):
 		self.verbose = verbose
@@ -51,6 +54,10 @@ class Reactor:
 			self.goalY = goal
 		elif(location == "W"):
 			self.goalW = goal
+
+	def setSenseList(self, senseList):
+		self.redWaldo.setSenseList(senseList)
+		self.blueWaldo.setSenseList(senseList)
 
 	def isFinished(self):
 		return (self.doneY >= self.goalY and self.doneW >= self.goalW)
@@ -148,7 +155,7 @@ class Reactor:
 			for y in rangeY:
 				if(self.atomMap[x][y] != "E"):
 					atomToOutput = self.atomMap[x][y]
-					if(atomToOutput.isOutputable(location, cycle, waldo)):
+					if(atomToOutput.isOutputable(location, cycle, waldo, self.activateBigOutput, True)):
 						returnValue = returnValue or self.outputAtom(atomToOutput,location, cycle, waldo)
 						self.generateAtomMap()
 		return returnValue
@@ -210,7 +217,9 @@ class Reactor:
 	def getSymAtomAtSensor(self):
 		if(len(self.sensor) == 2):
 			atom = self.atomMap[self.sensor[0]][self.sensor[1]]
-			return atom.getSymbol()
+			if(atom != "E"):
+				return atom.getSymbole()
+		return "E"
 
 	def input(self,location, cycle, waldo):
 		if(location == "A"):

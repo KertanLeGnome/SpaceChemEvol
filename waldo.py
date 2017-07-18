@@ -20,6 +20,9 @@ class Waldo:
 		self.isRotating = False
 		self.rotationDir = 0
 
+	def setSenseList(self,senseList):
+		self.senseList = senseList
+
 	def setVerbose(self, verbose):
 		self.verbose = verbose
 
