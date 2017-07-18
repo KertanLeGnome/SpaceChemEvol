@@ -10,8 +10,8 @@ class Reactor:
 		self.redWaldo = waldo.Waldo("Red", self)
 		self.atomlist = []
 		self.atomMap = 0
-		self.moleculeA = 0
-		self.moleculeB = 0
+		self.moleculeA = []
+		self.moleculeB = []
 		self.moleculeY = 0
 		self.moleculeW = 0
 		self.verbose = False
@@ -25,6 +25,10 @@ class Reactor:
 		self.fuser = []
 		self.tunnel=[]
 		self.activateBigOutput = False
+		self.sequenceA = []
+		self.sequenceB = []
+		self.originalSequenceA = []
+		self.originalSequenceB = []
 
 	def setBonders(self, bonders):
 		self.bonders = bonders
@@ -134,6 +138,20 @@ class Reactor:
 	def getAtomAtLocation(self,x,y):
 		return self.atomMap[x][y]
 
+	def addMolecule(self, location, molecule):
+		if(location == "A"):
+			self.moleculeA.append(molecule)
+		elif(location == "B"):
+			self.moleculeB.append(molecule)
+
+	def setSequence(self,location,sequence):
+		if(location == "A"):
+			self.sequenceA = sequence
+			self.originalSequenceA = copy.copy(sequence)
+		elif(location == "B"):
+			self.sequenceB = sequence
+			self.originalSequenceB = copy.copy(sequence)
+
 	def setMolecule(self,location,molecule):
 		if(location == "A"):
 			self.moleculeA = molecule
@@ -223,9 +241,21 @@ class Reactor:
 
 	def input(self,location, cycle, waldo):
 		if(location == "A"):
-			mol = copy.deepcopy(self.moleculeA)
+			if(len(self.sequenceA) == 0):
+				mol = copy.deepcopy(self.moleculeA)
+			else:
+				mol = copy.deepcopy(self.moleculeA[self.sequenceA[0]])
+				self.sequenceA.pop(0)
+				if(len(self.sequenceA) == 0):
+					self.sequenceA = copy.copy(self.originalSequenceA)
 		else:
-			mol = copy.deepcopy(self.moleculeB)
+			if(len(self.sequenceB) == 0):
+				mol = copy.deepcopy(self.moleculeB)
+			else:
+				mol = copy.deepcopy(self.moleculeB[self.sequenceB[0]])
+				self.sequenceB.pop(0)
+				if(len(self.sequenceB) == 0):
+					self.sequenceB = copy.copy(self.originalSequenceB)
 		for i in mol.returnAllAtoms(cycle, waldo):
 			self.atomlist.append(i)
 
